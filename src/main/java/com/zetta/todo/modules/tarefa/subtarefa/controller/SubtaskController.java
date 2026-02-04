@@ -1,0 +1,24 @@
+package com.zetta.todo.modules.tarefa.subtarefa.controller;
+
+import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskCreateDTO;
+import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskResponseDTO;
+import com.zetta.todo.modules.tarefa.subtarefa.service.SubtaskService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/subtasks")
+@RequiredArgsConstructor
+public class SubtaskController {
+
+    private final SubtaskService subtaskService;
+
+    @PostMapping
+    public ResponseEntity<SubtaskResponseDTO> create(@RequestBody @Valid SubtaskCreateDTO dto) {
+        var subtask = subtaskService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(subtask);
+    }
+}
