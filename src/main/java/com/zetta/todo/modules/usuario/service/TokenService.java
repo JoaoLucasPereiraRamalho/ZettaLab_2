@@ -30,4 +30,17 @@ public class TokenService {
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
+
+    public String validateToken(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
+            return "";
+        }
+    }
 }
