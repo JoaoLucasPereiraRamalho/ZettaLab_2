@@ -29,4 +29,23 @@ public class CategoryController {
         var categories = categoryService.listAll();
         return ResponseEntity.ok(categories);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> findById(@PathVariable Long id) {
+        var category = categoryService.findById(id);
+        return ResponseEntity.ok(category);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> update(@PathVariable Long id,
+            @RequestBody @Valid CategoryCreateDTO dto) {
+        var category = categoryService.update(id, dto);
+        return ResponseEntity.ok(category);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

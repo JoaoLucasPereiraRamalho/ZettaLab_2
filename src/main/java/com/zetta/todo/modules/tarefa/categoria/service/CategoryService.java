@@ -53,4 +53,43 @@ public class CategoryService {
         dto.setColor(category.getColor());
         return dto;
     }
+
+    public CategoryResponseDTO findById(Long id) {
+        User user = getLoggedUser();
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Acesso negado a esta categoria");
+        }
+        return toResponseDTO(category);
+    }
+
+    public CategoryResponseDTO update(Long id, CategoryCreateDTO dto) {
+        User user = getLoggedUser();
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Você não pode alterar esta categoria");
+        }
+
+        category.setName(dto.getName());
+        category.setColor(dto.getColor());
+
+        category = categoryRepository.save(category);
+        return toResponseDTO(category);
+    }
+
+    public void delete(Long id) {
+        User user = getLoggedUser();
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Você não pode deletar esta categoria");
+        }
+
+        categoryRepository.delete(category);
+    }
 }
