@@ -15,6 +15,7 @@ import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskResponseDTO;
 import com.zetta.todo.modules.tarefa.subtarefa.domain.Subtask;
 import com.zetta.todo.modules.tarefa.tarefa.dto.DashboardResponseDTO;
 import com.zetta.todo.modules.tarefa.categoria.domain.Category;
+import com.zetta.todo.modules.tarefa.tarefa.domain.TaskPriority;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +46,12 @@ public class TaskService {
         task.setStatus(TaskStatus.PENDING);
         task.setUser(user);
         task.setCategory(category);
+
+        if (dto.getPriority() != null) {
+            task.setPriority(dto.getPriority());
+        } else {
+            task.setPriority(TaskPriority.MEDIA);
+        }
 
         task = taskRepository.save(task);
 
@@ -79,6 +86,7 @@ public class TaskService {
         catDto.setName(task.getCategory().getName());
         catDto.setColor(task.getCategory().getColor());
         dto.setCategory(catDto);
+        dto.setPriority(task.getPriority());
 
         // CONVERTER SUBTAREFAS
         if (task.getSubtasks() != null) {

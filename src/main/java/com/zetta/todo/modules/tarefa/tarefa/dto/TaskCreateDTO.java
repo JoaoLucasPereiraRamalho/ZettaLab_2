@@ -3,6 +3,7 @@ package com.zetta.todo.modules.tarefa.tarefa.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import com.zetta.todo.modules.tarefa.tarefa.domain.TaskPriority;
 
 import java.time.LocalDateTime;
 
@@ -17,4 +18,6 @@ public class TaskCreateDTO {
 
     @NotNull(message = "A categoria é obrigatória")
     private Long categoryId;
+
+    private TaskPriority priority;
 }

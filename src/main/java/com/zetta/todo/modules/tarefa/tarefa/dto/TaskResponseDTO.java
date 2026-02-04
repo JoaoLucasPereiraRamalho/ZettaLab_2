@@ -4,6 +4,7 @@ import com.zetta.todo.modules.tarefa.categoria.dto.CategoryResponseDTO;
 import com.zetta.todo.modules.tarefa.tarefa.domain.TaskStatus;
 import lombok.Data;
 import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskResponseDTO;
+import com.zetta.todo.modules.tarefa.tarefa.domain.TaskPriority;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,4 +21,6 @@ public class TaskResponseDTO {
     private CategoryResponseDTO category;
 
     private List<SubtaskResponseDTO> subtasks;
+
+    private TaskPriority priority;
 }

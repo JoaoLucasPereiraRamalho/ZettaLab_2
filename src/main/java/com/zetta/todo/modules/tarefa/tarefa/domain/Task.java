@@ -2,6 +2,7 @@ package com.zetta.todo.modules.tarefa.tarefa.domain;
 
 import com.zetta.todo.modules.tarefa.categoria.domain.Category;
 import com.zetta.todo.modules.tarefa.subtarefa.domain.Subtask;
+import com.zetta.todo.modules.tarefa.tarefa.domain.TaskPriority;
 import com.zetta.todo.modules.usuario.domain.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -49,4 +50,8 @@ public class Task {
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Subtask> subtasks = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskPriority priority = TaskPriority.MEDIA;
 }

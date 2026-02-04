@@ -21,6 +21,7 @@ CREATE TABLE tasks (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     status VARCHAR(50) DEFAULT 'PENDING' NOT NULL,
+    priority VARCHAR(50) DEFAULT 'MEDIA' NOT NULL, -- Novo Campo
     due_date TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id BIGINT NOT NULL,
@@ -32,17 +33,4 @@ CREATE TABLE subtasks (
     description TEXT NOT NULL,
     status VARCHAR(50) DEFAULT 'PENDING' NOT NULL,
     task_id BIGINT NOT NULL
-);
-
-CREATE TABLE tags (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    color VARCHAR(20) NOT NULL,
-    user_id BIGINT NOT NULL
-);
-
-CREATE TABLE task_tags (
-    task_id BIGINT NOT NULL, -- BIGINT
-    tag_id BIGINT NOT NULL, -- BIGINT
-    PRIMARY KEY (task_id, tag_id)
 );

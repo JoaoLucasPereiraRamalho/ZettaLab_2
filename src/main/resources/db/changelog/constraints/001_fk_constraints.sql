@@ -12,12 +12,3 @@ ADD CONSTRAINT fk_task_category FOREIGN KEY (category_id) REFERENCES categories 
 
 ALTER TABLE subtasks
 ADD CONSTRAINT fk_subtask_task FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE;
-
-ALTER TABLE tags
-ADD CONSTRAINT fk_tag_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
-
-ALTER TABLE task_tags
-ADD CONSTRAINT fk_tasktags_task FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE;
-
-ALTER TABLE task_tags
-ADD CONSTRAINT fk_tasktags_tag FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE;
