@@ -13,10 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskResponseDTO;
 import com.zetta.todo.modules.tarefa.subtarefa.domain.Subtask;
+import com.zetta.todo.modules.tarefa.tarefa.dto.DashboardResponseDTO;
+import com.zetta.todo.modules.tarefa.categoria.domain.Category;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Collections;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -95,5 +98,30 @@ public class TaskService {
         }
 
         return dto;
+    }
+
+    public List<DashboardResponseDTO> listByDashboard() {
+        User user = getLoggedUser();
+
+        List<Task> allTasks = taskRepository.findAllByUserId(user.getId());
+
+        List<Category> allCategories = categoryRepository.findAllByUserId(user.getId());
+
+        List<DashboardResponseDTO> dashboard = new ArrayList<>();
+
+        for (Category category : allCategories) {
+            var tasksOfCategory = allTasks.stream()
+                    .filter(task -> task.getCategory().getId().equals(category.getId()))
+                    .map(this::toResponseDTO)
+                    .collect(Collectors.toList());
+
+            dashboard.add(new DashboardResponseDTO(
+                    category.getId(),
+                    category.getName(),
+                    category.getColor(),
+                    tasksOfCategory));
+        }
+
+        return dashboard;
     }
 }

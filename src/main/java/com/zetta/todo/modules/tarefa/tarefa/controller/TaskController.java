@@ -3,6 +3,7 @@ package com.zetta.todo.modules.tarefa.tarefa.controller;
 import com.zetta.todo.modules.tarefa.tarefa.dto.TaskCreateDTO;
 import com.zetta.todo.modules.tarefa.tarefa.dto.TaskResponseDTO;
 import com.zetta.todo.modules.tarefa.tarefa.service.TaskService;
+import com.zetta.todo.modules.tarefa.tarefa.dto.DashboardResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,5 +29,11 @@ public class TaskController {
     public ResponseEntity<List<TaskResponseDTO>> list() {
         var tasks = taskService.listAll();
         return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<List<DashboardResponseDTO>> dashboard() {
+        var result = taskService.listByDashboard();
+        return ResponseEntity.ok(result);
     }
 }
