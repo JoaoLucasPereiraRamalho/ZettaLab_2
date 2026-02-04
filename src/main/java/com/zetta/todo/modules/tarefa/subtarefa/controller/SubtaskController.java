@@ -21,4 +21,16 @@ public class SubtaskController {
         var subtask = subtaskService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(subtask);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        subtaskService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<SubtaskResponseDTO> updateStatus(@PathVariable Long id, @RequestBody TaskStatus status) {
+        var subtask = subtaskService.updateStatus(id, status);
+        return ResponseEntity.ok(subtask);
+    }
 }

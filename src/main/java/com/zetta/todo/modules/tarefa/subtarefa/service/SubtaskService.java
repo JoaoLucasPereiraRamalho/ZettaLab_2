@@ -60,4 +60,30 @@ public class SubtaskService {
         dto.setTaskId(subtask.getTask().getId());
         return dto;
     }
+
+    public void delete(Long id) {
+        User user = getLoggedUser();
+        Subtask subtask = subtaskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+
+        if (!subtask.getTask().getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Você não tem permissão para remover este item");
+        }
+
+        subtaskRepository.delete(subtask);
+    }
+
+    public SubtaskResponseDTO updateStatus(Long id, TaskStatus status) {
+        User user = getLoggedUser();
+        Subtask subtask = subtaskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+
+        if (!subtask.getTask().getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Permissão negada");
+        }
+
+        subtask.setStatus(status);
+        subtask = subtaskRepository.save(subtask);
+        return toResponseDTO(subtask);
+    }
 }
