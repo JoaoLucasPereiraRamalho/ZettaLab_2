@@ -9,16 +9,16 @@ import java.time.LocalDateTime;
 
 @Data
 public class TaskCreateDTO {
-    @NotBlank(message = "O título é obrigatório")
+    @NotBlank(message = "{validation.title.required}")
     private String title;
 
     private String description;
 
-    @FutureOrPresent(message = "A data de vencimento não pode ser no passado")
+    @FutureOrPresent(message = "{validation.date.future}")
     private LocalDateTime dueDate;
 
     private TaskPriority priority;
 
-    @NotNull(message = "A categoria é obrigatória")
+    @NotNull(message = "{validation.category.required}")
     private Long categoryId;
 }

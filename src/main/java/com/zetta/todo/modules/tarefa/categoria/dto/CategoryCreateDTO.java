@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 public class CategoryCreateDTO {
-    @NotBlank(message = "O nome é obrigatório")
-    @Size(min = 3, max = 50, message = "O nome deve ter entre 3 e 50 caracteres")
+    @NotBlank(message = "{validation.name.required}")
+    @Size(min = 3, max = 50, message = "{validation.name.size}")
     private String name;
 
-    @NotBlank(message = "A cor é obrigatória")
+    @NotBlank(message = "{validation.color.required}")
     private String color;
 }

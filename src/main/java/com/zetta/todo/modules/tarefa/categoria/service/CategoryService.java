@@ -1,11 +1,11 @@
 package com.zetta.todo.modules.tarefa.categoria.service;
 
+import com.zetta.todo.common.exception.BusinessException; // IMPORTANTE
 import com.zetta.todo.modules.tarefa.categoria.domain.Category;
 import com.zetta.todo.modules.tarefa.categoria.dto.CategoryCreateDTO;
 import com.zetta.todo.modules.tarefa.categoria.dto.CategoryResponseDTO;
 import com.zetta.todo.modules.tarefa.categoria.repository.CategoryRepository;
 import com.zetta.todo.modules.usuario.domain.User;
-import com.zetta.todo.modules.usuario.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,11 +18,9 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
 
     public CategoryResponseDTO create(CategoryCreateDTO dto) {
-        User user = getLoggedUser(); // Descobre quem está logado
-
+        User user = getLoggedUser();
         Category category = new Category();
         category.setName(dto.getName());
         category.setColor(dto.getColor());
@@ -34,33 +32,18 @@ public class CategoryService {
 
     public List<CategoryResponseDTO> listAll() {
         User user = getLoggedUser();
-        var categories = categoryRepository.findAllByUserId(user.getId());
-
-        return categories.stream()
+        return categoryRepository.findAllByUserId(user.getId()).stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
-    }
-
-    private User getLoggedUser() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (User) authentication.getPrincipal();
-    }
-
-    private CategoryResponseDTO toResponseDTO(Category category) {
-        CategoryResponseDTO dto = new CategoryResponseDTO();
-        dto.setId(category.getId());
-        dto.setName(category.getName());
-        dto.setColor(category.getColor());
-        return dto;
     }
 
     public CategoryResponseDTO findById(Long id) {
         User user = getLoggedUser();
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new BusinessException("category.not.found"));
 
         if (!category.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Acesso negado a esta categoria");
+            throw new BusinessException("category.owner.error");
         }
         return toResponseDTO(category);
     }
@@ -68,10 +51,10 @@ public class CategoryService {
     public CategoryResponseDTO update(Long id, CategoryCreateDTO dto) {
         User user = getLoggedUser();
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new BusinessException("category.not.found"));
 
         if (!category.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não pode alterar esta categoria");
+            throw new BusinessException("category.owner.error");
         }
 
         category.setName(dto.getName());
@@ -84,12 +67,21 @@ public class CategoryService {
     public void delete(Long id) {
         User user = getLoggedUser();
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new BusinessException("category.not.found"));
 
         if (!category.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não pode deletar esta categoria");
+            throw new BusinessException("category.delete.error");
         }
 
         categoryRepository.delete(category);
+    }
+
+    private User getLoggedUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
+    }
+
+    private CategoryResponseDTO toResponseDTO(Category category) {
+        return new CategoryResponseDTO(category.getId(), category.getName(), category.getColor());
     }
 }

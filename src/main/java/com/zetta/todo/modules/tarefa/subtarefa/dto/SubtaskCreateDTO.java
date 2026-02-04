@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 public class SubtaskCreateDTO {
-    @NotBlank(message = "A descrição é obrigatória")
+    @NotBlank(message = "{validation.description.required}")
     private String description;
 
-    @NotNull(message = "O ID da tarefa pai é obrigatório")
+    @NotNull(message = "{validation.task.required}")
     private Long taskId;
 }
