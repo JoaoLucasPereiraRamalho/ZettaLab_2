@@ -1,6 +1,7 @@
 package com.zetta.todo.modules.tarefa.tarefa.domain;
 
 import com.zetta.todo.modules.tarefa.categoria.domain.Category;
+import com.zetta.todo.modules.tarefa.subtarefa.domain.Subtask;
 import com.zetta.todo.modules.usuario.domain.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
@@ -43,4 +46,7 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Subtask> subtasks = new ArrayList<>();
 }

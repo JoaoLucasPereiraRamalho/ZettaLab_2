@@ -11,9 +11,12 @@ import com.zetta.todo.modules.usuario.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskResponseDTO;
+import com.zetta.todo.modules.tarefa.subtarefa.domain.Subtask;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +76,23 @@ public class TaskService {
         catDto.setName(task.getCategory().getName());
         catDto.setColor(task.getCategory().getColor());
         dto.setCategory(catDto);
+
+        // CONVERTER SUBTAREFAS
+        if (task.getSubtasks() != null) {
+            List<SubtaskResponseDTO> subItems = task.getSubtasks().stream()
+                    .map(sub -> {
+                        SubtaskResponseDTO subDto = new SubtaskResponseDTO();
+                        subDto.setId(sub.getId());
+                        subDto.setDescription(sub.getDescription());
+                        subDto.setStatus(sub.getStatus());
+                        subDto.setTaskId(task.getId());
+                        return subDto;
+                    })
+                    .collect(Collectors.toList());
+            dto.setSubtasks(subItems);
+        } else {
+            dto.setSubtasks(Collections.emptyList());
+        }
 
         return dto;
     }
