@@ -132,4 +132,55 @@ public class TaskService {
 
         return dashboard;
     }
+
+    public TaskResponseDTO findById(Long id) {
+        Task task = validateOwnerAndGetTask(id);
+        return toResponseDTO(task);
+    }
+
+    public TaskResponseDTO update(Long id, TaskCreateDTO dto) {
+        Task task = validateOwnerAndGetTask(id);
+
+        if (!task.getCategory().getId().equals(dto.getCategoryId())) {
+            var newCategory = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Nova categoria não encontrada"));
+
+            if (!newCategory.getUser().getId().equals(task.getUser().getId())) {
+                throw new RuntimeException("Categoria inválida");
+            }
+            task.setCategory(newCategory);
+        }
+
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setDueDate(dto.getDueDate());
+        if (dto.getPriority() != null)
+            task.setPriority(dto.getPriority());
+
+        task = taskRepository.save(task);
+        return toResponseDTO(task);
+    }
+
+    public TaskResponseDTO updateStatus(Long id, TaskStatus status) {
+        Task task = validateOwnerAndGetTask(id);
+        task.setStatus(status);
+        taskRepository.save(task);
+        return toResponseDTO(task);
+    }
+
+    public void delete(Long id) {
+        Task task = validateOwnerAndGetTask(id);
+        taskRepository.delete(task);
+    }
+
+    private Task validateOwnerAndGetTask(Long id) {
+        User user = getLoggedUser();
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+
+        if (!task.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Você não tem permissão para acessar esta tarefa");
+        }
+        return task;
+    }
 }

@@ -4,6 +4,7 @@ import com.zetta.todo.modules.tarefa.tarefa.dto.TaskCreateDTO;
 import com.zetta.todo.modules.tarefa.tarefa.dto.TaskResponseDTO;
 import com.zetta.todo.modules.tarefa.tarefa.service.TaskService;
 import com.zetta.todo.modules.tarefa.tarefa.dto.DashboardResponseDTO;
+import com.zetta.todo.modules.tarefa.tarefa.domain.TaskStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,4 +37,26 @@ public class TaskController {
         var result = taskService.listByDashboard();
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskResponseDTO> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(taskService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskResponseDTO> update(@PathVariable Long id, @RequestBody @Valid TaskCreateDTO dto) {
+        return ResponseEntity.ok(taskService.update(id, dto));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<TaskResponseDTO> updateStatus(@PathVariable Long id, @RequestBody TaskStatus status) {
+        return ResponseEntity.ok(taskService.updateStatus(id, status));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        taskService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
