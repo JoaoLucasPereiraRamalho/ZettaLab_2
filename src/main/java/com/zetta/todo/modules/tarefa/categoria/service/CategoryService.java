@@ -22,9 +22,10 @@ public class CategoryService {
     public CategoryResponseDTO create(CategoryCreateDTO dto) {
         User user = getLoggedUser();
 
-        if (categoryRepository.existsByNameAndUserId(dto.getName(), user.getId())) {
+        if (categoryRepository.existsByNameIgnoreCaseAndUserId(dto.getName(), user.getId())) {
             throw new BusinessException("Você já possui uma categoria com este nome.");
         }
+
         Category category = new Category();
         category.setName(dto.getName());
         category.setColor(dto.getColor());
