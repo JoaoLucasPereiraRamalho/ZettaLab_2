@@ -26,18 +26,33 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        var token = recoverToken(request);
 
-        if (token != null) {
-            var login = tokenService.validateToken(token);
+        try {
+            var token = recoverToken(request);
 
-            if (!login.isEmpty()) {
-                User user = userRepository.findByEmail(login).orElseThrow(() -> new RuntimeException("User Not Found"));
+            if (token != null) {
+                var login = tokenService.validateToken(token);
 
-                var authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                // Adicionado verificação de null para evitar NullPointerException
+                if (login != null && !login.isEmpty()) {
+                    User user = userRepository.findByEmail(login)
+                            .orElse(null); // Mudado para orElse(null) para não quebrar com erro 500
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    if (user != null) {
+                        var authentication = new UsernamePasswordAuthenticationToken(user, null,
+                                Collections.emptyList());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
             }
+        } catch (Exception e) {
+            // ⚠️ O PULO DO GATO:
+            // Se o token for inválido ou expirar, caímos aqui.
+            // Não fazemos nada (não lançamos erro), apenas ignoramos a autenticação.
+            // Assim, o request segue para o próximo passo.
+            // Se for rota do Swagger (pública), vai abrir.
+            // Se for rota de Tasks (privada), o Spring Security vai barrar com 403.
+            System.out.println("Erro na validação do token (ignorado para rotas públicas): " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
@@ -46,6 +61,9 @@ public class SecurityFilter extends OncePerRequestFilter {
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
         if (authHeader == null)
+            return null;
+        // Pequena melhoria para garantir que só pega se tiver o Bearer
+        if (!authHeader.startsWith("Bearer "))
             return null;
 
         return authHeader.replace("Bearer ", "");
