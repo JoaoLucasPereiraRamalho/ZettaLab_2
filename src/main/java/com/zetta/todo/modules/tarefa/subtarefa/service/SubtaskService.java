@@ -1,9 +1,10 @@
 package com.zetta.todo.modules.tarefa.subtarefa.service;
 
-import com.zetta.todo.common.exception.BusinessException; // IMPORTANTE
+import com.zetta.todo.common.exception.BusinessException;
 import com.zetta.todo.modules.tarefa.subtarefa.domain.Subtask;
 import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskResponseDTO;
 import com.zetta.todo.modules.tarefa.subtarefa.repository.SubtaskRepository;
+import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskCreateDTO;
 import com.zetta.todo.modules.tarefa.tarefa.domain.TaskStatus;
 import com.zetta.todo.modules.tarefa.tarefa.repository.TaskRepository;
 import com.zetta.todo.modules.usuario.domain.User;
@@ -18,17 +19,19 @@ public class SubtaskService {
     private final SubtaskRepository subtaskRepository;
     private final TaskRepository taskRepository;
 
-    public SubtaskResponseDTO create(Long taskId, String description) {
+    public SubtaskResponseDTO create(SubtaskCreateDTO dto) {
         User user = getLoggedUser();
-        var task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new BusinessException("task.not.found", taskId));
+
+        // Use dto.getTaskId()
+        var task = taskRepository.findById(dto.getTaskId())
+                .orElseThrow(() -> new BusinessException("task.not.found", dto.getTaskId()));
 
         if (!task.getUser().getId().equals(user.getId())) {
             throw new BusinessException("task.owner.error");
         }
 
         Subtask subtask = new Subtask();
-        subtask.setDescription(description);
+        subtask.setDescription(dto.getDescription()); // Use dto.getDescription()
         subtask.setTask(task);
         subtask.setStatus(TaskStatus.PENDING);
 

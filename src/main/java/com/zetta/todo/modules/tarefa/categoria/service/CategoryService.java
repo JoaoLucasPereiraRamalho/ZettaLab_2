@@ -1,6 +1,6 @@
 package com.zetta.todo.modules.tarefa.categoria.service;
 
-import com.zetta.todo.common.exception.BusinessException; // IMPORTANTE
+import com.zetta.todo.common.exception.BusinessException;
 import com.zetta.todo.modules.tarefa.categoria.domain.Category;
 import com.zetta.todo.modules.tarefa.categoria.dto.CategoryCreateDTO;
 import com.zetta.todo.modules.tarefa.categoria.dto.CategoryResponseDTO;

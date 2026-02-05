@@ -3,6 +3,7 @@ package com.zetta.todo.modules.tarefa.subtarefa.controller;
 import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskCreateDTO;
 import com.zetta.todo.modules.tarefa.subtarefa.dto.SubtaskResponseDTO;
 import com.zetta.todo.modules.tarefa.subtarefa.service.SubtaskService;
+import com.zetta.todo.modules.tarefa.tarefa.domain.TaskStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
