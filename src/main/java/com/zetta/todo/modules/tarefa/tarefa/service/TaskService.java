@@ -89,6 +89,9 @@ public class TaskService {
 
     public TaskResponseDTO updateStatus(Long id, TaskStatus status) {
         Task task = validateOwnerAndGetTask(id);
+
+        validateSubtaskConsistency(task, status);
+
         task.setStatus(status);
         taskRepository.save(task);
         return toResponseDTO(task);
@@ -116,6 +119,25 @@ public class TaskService {
         return dashboard;
     }
 
+    // --- MÉTODOS AUXILIARES ---
+
+    /**
+     * Valida se a tarefa pode assumir o novo status.
+     * Regra: Não pode ser COMPLETED se houver subtarefas pendentes.
+     */
+    private void validateSubtaskConsistency(Task task, TaskStatus newStatus) {
+        if (newStatus == TaskStatus.COMPLETED) {
+            if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
+                boolean hasPending = task.getSubtasks().stream()
+                        .anyMatch(sub -> sub.getStatus() != TaskStatus.COMPLETED);
+
+                if (hasPending) {
+                    throw new BusinessException("Não é possível concluir a tarefa pois existem subtarefas pendentes.");
+                }
+            }
+        }
+    }
+
     private Task validateOwnerAndGetTask(Long id) {
         User user = getLoggedUser();
         Task task = taskRepository.findById(id)
@@ -133,7 +155,6 @@ public class TaskService {
     }
 
     private TaskResponseDTO toResponseDTO(Task task) {
-
         TaskResponseDTO dto = new TaskResponseDTO();
         dto.setId(task.getId());
         dto.setTitle(task.getTitle());
