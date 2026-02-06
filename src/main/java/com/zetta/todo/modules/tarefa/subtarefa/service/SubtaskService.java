@@ -22,18 +22,33 @@ public class SubtaskService {
     public SubtaskResponseDTO create(SubtaskCreateDTO dto) {
         User user = getLoggedUser();
 
-        // Use dto.getTaskId()
+        // Busca a tarefa pai
         var task = taskRepository.findById(dto.getTaskId())
                 .orElseThrow(() -> new BusinessException("task.not.found", dto.getTaskId()));
 
+        // Valida o dono da tarefa
         if (!task.getUser().getId().equals(user.getId())) {
             throw new BusinessException("task.owner.error");
         }
 
+        // --- INÍCIO DAS VALIDAÇÕES DE DATA ---
+        if (dto.getDueDate() != null) {
+            if (dto.getDueDate().isBefore(java.time.LocalDate.now())) {
+                throw new BusinessException("A data da subtarefa não pode ser no passado.");
+            }
+
+            if (task.getDueDate() != null && dto.getDueDate().isAfter(task.getDueDate())) {
+                throw new BusinessException(
+                        "A subtarefa não pode vencer depois da tarefa principal (" + task.getDueDate() + ").");
+            }
+        }
+
         Subtask subtask = new Subtask();
-        subtask.setDescription(dto.getDescription()); // Use dto.getDescription()
+        subtask.setDescription(dto.getDescription());
         subtask.setTask(task);
         subtask.setStatus(TaskStatus.PENDING);
+
+        subtask.setDueDate(dto.getDueDate());
 
         subtask = subtaskRepository.save(subtask);
         return toResponseDTO(subtask);
