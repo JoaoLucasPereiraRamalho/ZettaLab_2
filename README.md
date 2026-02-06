@@ -1,51 +1,210 @@
-🚀 Zetta Todo API - Backend
-API REST robusta para gerenciamento de tarefas e organização via quadros Kanban. O sistema conta com autenticação segura, versionamento de banco de dados e uma arquitetura focada em escalabilidade e manutenção.
+# Zetta Todo API
 
-🛠️ Tecnologias Utilizadas
-Java 21 & Spring Boot 3.4.2
+API REST para gerenciamento de tarefas e organização via quadros Kanban. Sistema completo com autenticação JWT, versionamento de banco de dados e mensagens internacionalizadas.
 
-Spring Security + JWT (Autenticação e Autorização)
+---
 
-Spring Data JPA (Persistência de Dados)
+## Índice
 
-PostgreSQL (Banco de Dados Relacional)
+- [Funcionalidades](#-funcionalidades)
+- [Stack Tecnológica](#-stack-tecnológica)
+- [Arquitetura](#-arquitetura)
+- [Pré-requisitos](#-pré-requisitos)
+- [Como Executar](#-como-executar)
+- [Variáveis de Ambiente](#-variáveis-de-ambiente)
+- [Documentação da API](#-documentação-da-api)
+- [Endpoints](#-endpoints)
+- [Autenticação](#-autenticação)
+- [Internacionalização](#-internacionalização)
 
-Docker & Docker Compose (Containerização do Banco)
+---
 
-Liquibase (Migrações e Versionamento do Schema)
+## Funcionalidades
 
-Lombok (Redução de Boilerplate)
+- **Autenticação** — Login com JWT (JSON Web Token)
+- **Usuários** — Cadastro de usuários
+- **Categorias** — CRUD de categorias com cores para organização visual
+- **Tarefas** — CRUD de tarefas com prioridade, status e data de vencimento
+- **Subtasks** — Tarefas vinculadas com regras de conclusão (bloqueio se houver pendentes)
+- **Dashboard** — Visualização agrupada por categorias
+- **i18n** — Mensagens de erro em português e inglês
 
-Maven (Gerenciamento de Dependências)
+---
 
-🏗️ Padrões de Projeto e Arquitetura
-A API foi construída seguindo princípios de Clean Code e SOLID:
+## Stack Tecnológica
 
-Camada de Mapper: Utilização de classes Mapper dedicadas para converter Entidades em DTOs, garantindo que a lógica de apresentação não polua as regras de negócio.
+| Tecnologia | Versão |
+|------------|--------|
+| Java | 21 |
+| Spring Boot | 4.0.2 |
+| Spring Security + JWT | — |
+| Spring Data JPA | — |
+| PostgreSQL | 16 |
+| Liquibase | — |
+| Docker & Docker Compose | — |
+| Maven | — |
+| Lombok | — |
 
-Service Layer: Centralização da inteligência do sistema (ex: regras para conclusão de tarefas com subtarefas pendentes e reabertura automática de itens).
+---
 
-Global Exception Handling: Tratamento padronizado de erros e validações.
+## Arquitetura
 
-⚙️ Como Rodar o Projeto
-Pré-requisitos
-Java 21 instalado.
+O projeto segue princípios de **Clean Code** e **SOLID**:
 
-Docker e Docker Compose instalados.
+- **Módulos por domínio** — `usuario`, `tarefa` (categoria, tarefa, subtarefa)
+- **Camadas** — Controller → Service → Repository
+- **Mapper** — Conversão Entidade ↔ DTO
+- **Global Exception Handler** — Tratamento centralizado de erros e validações
+- **BusinessException** — Regras de negócio com chaves i18n
 
-Maven instalado.
+---
 
-Passo 1: Subir o Banco de Dados (Docker)
-Na raiz do projeto backend, onde se encontra o arquivo docker-compose.yml, execute:
+## Pré-requisitos
 
-Bash
+- **Java 21** ou superior
+- **Docker** e **Docker Compose**
+- **Maven 3.8+** (ou use o wrapper `./mvnw`)
+
+---
+
+## Como Executar
+
+### 1. Clonar e entrar no diretório
+
+```bash
+git clone <url-do-repositorio>
+cd todo-api
+```
+
+### 2. Subir o banco de dados
+
+```bash
 docker compose up -d
-Isso iniciará um container PostgreSQL com as configurações necessárias para a aplicação.
+```
 
-Passo 2: Executar a Aplicação
-Com o banco de dados ativo, rode o comando:
+Isso inicia um container PostgreSQL na porta **5434** com as variáveis definidas em `.env` ou valores padrão.
 
-Bash
-mvn clean install
-mvn spring-boot:run
-A API estará disponível em http://localhost:8080.
+### 3. Rodar a aplicação
+
+```bash
+./mvnw clean spring-boot:run
+```
+
+A API ficará disponível em **http://localhost:8080**.
+
+> **Nota:** Se a porta 8080 estiver em uso, configure `server.port` em `application.properties` ou encerre o processo que a utiliza.
+
+---
+
+## Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto (ou exporte as variáveis):
+
+| Variável | Descrição | Padrão |
+|----------|-----------|--------|
+| `DB_NAME` | Nome do banco de dados | `zetta_todo_db` |
+| `DB_USER` | Usuário PostgreSQL | `postgres` |
+| `DB_PASSWORD` | Senha PostgreSQL | `postgres` |
+| `JWT_SECRET` | Chave secreta para assinatura do JWT | `segredo_padrao_dev` |
+
+> **Atenção:** Em produção, use sempre um `JWT_SECRET` forte e seguro. (deve ter mais de 32 caracteres)
+
+---
+
+## Endpoints
+
+### Autenticação
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/auth/login` | Login (retorna JWT) |
+
+### Usuários
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/users` | Cadastro de usuário |
+
+### Categorias
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/categories` | Listar categorias |
+| GET | `/categories/{id}` | Buscar por ID |
+| POST | `/categories` | Criar categoria |
+| PUT | `/categories/{id}` | Atualizar categoria |
+| DELETE | `/categories/{id}` | Excluir categoria |
+
+### Tarefas
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/tasks` | Listar tarefas |
+| GET | `/tasks/dashboard` | Dashboard agrupado por categoria |
+| GET | `/tasks/{id}` | Buscar por ID |
+| POST | `/tasks` | Criar tarefa |
+| PUT | `/tasks/{id}` | Atualizar tarefa |
+| PATCH | `/tasks/{id}/status` | Atualizar status |
+| DELETE | `/tasks/{id}` | Excluir tarefa |
+
+### Subtarefas
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/subtasks` | Criar subtarefa |
+| PATCH | `/subtasks/{id}/status` | Atualizar status |
+| DELETE | `/subtasks/{id}` | Excluir subtarefa |
+
+> Endpoints de categorias, tarefas e subtarefas exigem autenticação via header `Authorization: Bearer <token>`.
+
+---
+
+## Autenticação
+
+1. Faça login em `POST /auth/login` com `email` e `password`.
+2. Use o token retornado no header das requisições:
+
+```
+Authorization: Bearer <seu-token-jwt>
+```
+
+---
+
+## Internacionalização
+
+As mensagens de erro suportam **português** e **inglês**. O idioma é definido pelo header:
+
+```
+Accept-Language: pt-BR
+```
+
+ou
+
+```
+Accept-Language: en
+```
+
+Arquivos de mensagens em `src/main/resources/`:
+
+- `messages.properties` (inglês)
+- `messages_pt.properties` (português)
+
+---
+
+## Estrutura do Projeto
+
+```
+src/main/java/com/zetta/todo/
+├── common/           # Configurações e exceções globais
+│   ├── config/       # Security, CORS, Swagger
+│   ├── dto/          # ErrorResponseDTO
+│   └── exception/    # BusinessException, GlobalExceptionHandler
+├── modules/
+│   ├── usuario/      # Auth, User
+│   └── tarefa/
+│       ├── categoria/
+│       ├── tarefa/
+│       └── subtarefa/
+└── TodoApiApplication.java
+```
+
+---
+
+## Licença
+
+Projeto desenvolvido para **zettaLab**.
