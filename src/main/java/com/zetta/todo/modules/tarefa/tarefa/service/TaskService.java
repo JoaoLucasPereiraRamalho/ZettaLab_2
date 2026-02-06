@@ -84,9 +84,18 @@ public class TaskService {
         return taskMapper.toResponseDTO(task);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public TaskResponseDTO updateStatus(Long id, TaskStatus status) {
         Task task = validateOwnerAndGetTask(id);
+
         validateSubtaskConsistency(task, status);
+
+        if (task.getStatus() == TaskStatus.COMPLETED && status != TaskStatus.COMPLETED) {
+            if (task.getSubtasks() != null) {
+                task.getSubtasks().forEach(sub -> sub.setStatus(TaskStatus.PENDING));
+            }
+        }
+
         task.setStatus(status);
         taskRepository.save(task);
         return taskMapper.toResponseDTO(task);
