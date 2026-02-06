@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,12 +37,11 @@ public class TaskService {
             throw new BusinessException("category.owner.error");
         }
 
-        if (dto.getDueDate() != null && dto.getDueDate().isBefore(java.time.LocalDate.now())) {
+        if (dto.getDueDate() != null && dto.getDueDate().isBefore(LocalDateTime.now())) {
             throw new BusinessException("A data de vencimento não pode ser no passado.");
         }
 
         Task task = taskMapper.toEntity(dto);
-
         task.setUser(user);
         task.setCategory(category);
 
@@ -64,7 +64,7 @@ public class TaskService {
     public TaskResponseDTO update(Long id, TaskCreateDTO dto) {
         Task task = validateOwnerAndGetTask(id);
 
-        if (dto.getDueDate() != null && dto.getDueDate().isBefore(java.time.LocalDate.now())) {
+        if (dto.getDueDate() != null && dto.getDueDate().isBefore(LocalDateTime.now())) {
             throw new BusinessException("A data de vencimento não pode ser no passado.");
         }
 
@@ -86,9 +86,7 @@ public class TaskService {
 
     public TaskResponseDTO updateStatus(Long id, TaskStatus status) {
         Task task = validateOwnerAndGetTask(id);
-
         validateSubtaskConsistency(task, status);
-
         task.setStatus(status);
         taskRepository.save(task);
         return taskMapper.toResponseDTO(task);
@@ -110,7 +108,7 @@ public class TaskService {
         for (var category : allCategories) {
             var tasksOfCategory = allTasks.stream()
                     .filter(task -> task.getCategory().getId().equals(category.getId()))
-                    .map(taskMapper::toResponseDTO) // Uso do Mapper
+                    .map(taskMapper::toResponseDTO)
                     .collect(Collectors.toList());
 
             dashboard.add(new DashboardResponseDTO(
@@ -121,8 +119,6 @@ public class TaskService {
         }
         return dashboard;
     }
-
-    // --- MÉTODOS AUXILIARES ---
 
     private void validateSubtaskConsistency(Task task, TaskStatus newStatus) {
         if (newStatus == TaskStatus.COMPLETED) {
