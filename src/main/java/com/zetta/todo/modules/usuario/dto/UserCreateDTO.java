@@ -7,14 +7,14 @@ import lombok.Data;
 
 @Data
 public class UserCreateDTO {
-    @NotBlank(message = "O nome é obrigatório")
+    @NotBlank(message = "{validation.name.required}")
     private String name;
 
-    @NotBlank(message = "O email é obrigatório")
-    @Email(message = "O email deve ser válido")
+    @NotBlank(message = "{validation.email.required}")
+    @Email(message = "{validation.email.invalid}")
     private String email;
 
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
+    @NotBlank(message = "{validation.password.required}")
+    @Size(min = 6, message = "{validation.password.size}")
     private String password;
 }

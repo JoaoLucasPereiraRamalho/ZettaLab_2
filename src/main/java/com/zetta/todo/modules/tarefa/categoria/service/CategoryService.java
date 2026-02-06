@@ -25,7 +25,7 @@ public class CategoryService {
         User user = getLoggedUser();
 
         if (categoryRepository.existsByNameIgnoreCaseAndUserId(dto.getName(), user.getId())) {
-            throw new BusinessException("Você já possui uma categoria com este nome.");
+            throw new BusinessException("category.name.duplicate");
         }
 
         Category category = categoryMapper.toEntity(dto);

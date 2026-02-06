@@ -38,7 +38,7 @@ public class TaskService {
         }
 
         if (dto.getDueDate() != null && dto.getDueDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessException("A data de vencimento não pode ser no passado.");
+            throw new BusinessException("task.date.past");
         }
 
         Task task = taskMapper.toEntity(dto);
@@ -65,7 +65,7 @@ public class TaskService {
         Task task = validateOwnerAndGetTask(id);
 
         if (dto.getDueDate() != null && dto.getDueDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessException("A data de vencimento não pode ser no passado.");
+            throw new BusinessException("task.date.past");
         }
 
         if (!task.getCategory().getId().equals(dto.getCategoryId())) {
@@ -136,7 +136,7 @@ public class TaskService {
                         .anyMatch(sub -> sub.getStatus() != TaskStatus.COMPLETED);
 
                 if (hasPending) {
-                    throw new BusinessException("Não é possível concluir a tarefa pois existem subtarefas pendentes.");
+                    throw new BusinessException("task.complete.subtasks.pending");
                 }
             }
         }

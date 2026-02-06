@@ -22,16 +22,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O nome é obrigatório")
+    @NotBlank(message = "{validation.name.required}")
     private String name;
 
-    @NotBlank(message = "O email é obrigatório")
-    @Email(message = "Formato de email inválido")
+    @NotBlank(message = "{validation.email.required}")
+    @Email(message = "{validation.email.invalid}")
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
+    @NotBlank(message = "{validation.password.required}")
+    @Size(min = 6, message = "{validation.password.size}")
     private String password;
 
     @CreationTimestamp

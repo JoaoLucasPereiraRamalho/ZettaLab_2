@@ -19,10 +19,10 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "{validation.name.required}")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "{validation.color.required}")
     private String color;
 
     @ManyToOne(fetch = FetchType.LAZY)

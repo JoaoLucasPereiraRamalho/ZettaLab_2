@@ -32,10 +32,13 @@ public class GlobalExceptionHandler {
             errors.add(new ErrorResponseDTO.ValidationError(error.getField(), message));
         }
 
+        String title = messageSource.getMessage("error.validation.title", null, LocaleContextHolder.getLocale());
+        String detail = messageSource.getMessage("error.validation.detail", null, LocaleContextHolder.getLocale());
+
         ErrorResponseDTO response = new ErrorResponseDTO(
-                "Erro de Validação",
+                title,
                 HttpStatus.BAD_REQUEST.value(),
-                "Verifique os campos informados",
+                detail,
                 LocalDateTime.now(),
                 errors);
 
@@ -47,11 +50,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleBusinessException(BusinessException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
-        // Se a chave contiver "not.found", mudamos o status para 404
         if (ex.getKey().contains("not.found")) {
             status = HttpStatus.NOT_FOUND;
         } else if (ex.getKey().contains("access.denied")) {
             status = HttpStatus.FORBIDDEN;
+        } else if (ex.getKey().contains("invalid.credentials")) {
+            status = HttpStatus.UNAUTHORIZED;
         }
 
         // TRADUÇÃO AQUI:
@@ -77,11 +81,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleGenericErrors(Exception ex) {
         ex.printStackTrace();
 
-        // Também traduzimos a mensagem genérica
         String message = messageSource.getMessage("error.generic", null, LocaleContextHolder.getLocale());
+        String title = messageSource.getMessage("error.internal.title", null, LocaleContextHolder.getLocale());
 
         ErrorResponseDTO response = new ErrorResponseDTO(
-                "Erro Interno",
+                title,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 message,
                 LocalDateTime.now(),

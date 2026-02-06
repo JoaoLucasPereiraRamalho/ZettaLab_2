@@ -1,5 +1,6 @@
 package com.zetta.todo.modules.usuario.service;
 
+import com.zetta.todo.common.exception.BusinessException;
 import com.zetta.todo.modules.usuario.domain.User;
 import com.zetta.todo.modules.usuario.dto.LoginRequestDTO;
 import com.zetta.todo.modules.usuario.dto.LoginResponseDTO;
@@ -19,10 +20,10 @@ public class AuthService {
     public LoginResponseDTO login(LoginRequestDTO dto) {
 
         User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário ou senha inválidos"));
+                .orElseThrow(() -> new BusinessException("auth.invalid.credentials"));
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Usuário ou senha inválidos");
+            throw new BusinessException("auth.invalid.credentials");
         }
 
         String token = tokenService.generateToken(user);

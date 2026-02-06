@@ -23,7 +23,7 @@ public class UserService {
     public UserResponseDTO create(UserCreateDTO dto) {
 
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new BusinessException("Email já cadastrado");
+            throw new BusinessException("user.email.duplicate");
         }
 
         User user = userMapper.toEntity(dto);
