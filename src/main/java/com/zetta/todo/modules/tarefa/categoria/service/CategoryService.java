@@ -4,6 +4,7 @@ import com.zetta.todo.common.exception.BusinessException;
 import com.zetta.todo.modules.tarefa.categoria.domain.Category;
 import com.zetta.todo.modules.tarefa.categoria.dto.CategoryCreateDTO;
 import com.zetta.todo.modules.tarefa.categoria.dto.CategoryResponseDTO;
+import com.zetta.todo.modules.tarefa.categoria.mapper.CategoryMapper; // <--- Import do Mapper
 import com.zetta.todo.modules.tarefa.categoria.repository.CategoryRepository;
 import com.zetta.todo.modules.usuario.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     public CategoryResponseDTO create(CategoryCreateDTO dto) {
         User user = getLoggedUser();
@@ -26,19 +28,19 @@ public class CategoryService {
             throw new BusinessException("Você já possui uma categoria com este nome.");
         }
 
-        Category category = new Category();
-        category.setName(dto.getName());
-        category.setColor(dto.getColor());
+        Category category = categoryMapper.toEntity(dto);
+
+        // Vínculo Obrigatório
         category.setUser(user);
 
         category = categoryRepository.save(category);
-        return toResponseDTO(category);
+        return categoryMapper.toResponseDTO(category);
     }
 
     public List<CategoryResponseDTO> listAll() {
         User user = getLoggedUser();
         return categoryRepository.findAllByUserId(user.getId()).stream()
-                .map(this::toResponseDTO)
+                .map(categoryMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -50,7 +52,7 @@ public class CategoryService {
         if (!category.getUser().getId().equals(user.getId())) {
             throw new BusinessException("category.owner.error");
         }
-        return toResponseDTO(category);
+        return categoryMapper.toResponseDTO(category);
     }
 
     public CategoryResponseDTO update(Long id, CategoryCreateDTO dto) {
@@ -62,11 +64,10 @@ public class CategoryService {
             throw new BusinessException("category.owner.error");
         }
 
-        category.setName(dto.getName());
-        category.setColor(dto.getColor());
+        categoryMapper.updateEntityFromDTO(category, dto);
 
         category = categoryRepository.save(category);
-        return toResponseDTO(category);
+        return categoryMapper.toResponseDTO(category);
     }
 
     public void delete(Long id) {
@@ -84,9 +85,5 @@ public class CategoryService {
     private User getLoggedUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();
-    }
-
-    private CategoryResponseDTO toResponseDTO(Category category) {
-        return new CategoryResponseDTO(category.getId(), category.getName(), category.getColor());
     }
 }
